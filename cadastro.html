@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>Cartão Fidelidade — Dono</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html {
+    touch-action: pan-y;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overscroll-behavior: none;
+  }
+  body {
+    margin: 0;
+    background: #1F1720;
+    color: #F3E9EC;
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    overscroll-behavior: none;
+    touch-action: pan-y;
+  }
+  input, button {
+    touch-action: manipulation;
+  }
+  .wrap { max-width: 460px; margin: 0 auto; padding: 32px 20px; }
+  .eyebrow {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    color: #9C8797; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    margin-bottom: 6px;
+  }
+  .eyebrow svg { color: #C98A97; }
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+    text-align: center;
+    font-size: 38px;
+    margin: 0 0 20px 0;
+    line-height: 1.05;
+  }
+  .ribbon {
+    height: 3px; width: 100%; border-radius: 999px;
+    background: linear-gradient(90deg, transparent, #C98A97 15%, #D9B382 50%, #C98A97 85%, transparent);
+    margin-bottom: 20px;
+  }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-bottom: 14px;
+  }
+  .toolbar button {
+    background: transparent; color: #9C8797; font-size: 12px; display: flex; align-items: center; gap: 6px;
+    font-family: inherit; cursor: pointer; border: 1px solid #423040; border-radius: 8px; padding: 7px 10px;
+  }
+  .toolbar button:hover { color: #C98A97; border-color: #C98A97; }
+  .panel {
+    background: #2A1F29; border: 1px solid #423040; border-radius: 14px;
+    padding: 16px; margin-bottom: 20px;
+  }
+  .panel .field { margin-bottom: 12px; }
+  label { font-size: 12px; color: #9C8797; display: block; margin-bottom: 6px; }
+  input {
+    width: 100%;
+    background: #1F1720; border: 1px solid #423040; border-radius: 10px;
+    color: #F3E9EC; padding: 12px 14px; font-size: 16px; outline: none;
+    font-family: inherit;
+  }
+  input:focus { border-color: #C98A97; }
+  .row { display: flex; gap: 8px; }
+  .row input { flex: 1; }
+  button { font-family: inherit; cursor: pointer; border: none; }
+  .btn-gold {
+    width: 100%; background: linear-gradient(90deg, #C98A97, #D9B382); color: #1F1720; font-weight: 600; border-radius: 10px;
+    padding: 13px 18px; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-icon {
+    background: linear-gradient(90deg, #C98A97, #D9B382); color: #1F1720; border-radius: 10px; width: 48px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card {
+    background: #2A1F29; border: 1px solid #423040; border-radius: 18px;
+    padding: 20px; margin-top: 20px;
+  }
+  .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .card-name { font-size: 12px; color: #9C8797; }
+  .card-progress { font-size: 14px; color: #E4D6DA; margin-top: 2px; }
+  .redeemed { color: #D9B382; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .stamp {
+    aspect-ratio: 1; border-radius: 999px; display: flex; align-items: center; justify-content: center;
+    border: 2px solid #423040; font-size: 12px; color: #6f5f6c; font-weight: 500;
+    transition: all 0.25s ease;
+  }
+  .stamp.filled {
+    background: linear-gradient(135deg, #C98A97, #D9B382); border-color: transparent; color: #1F1720;
+    box-shadow: 0 0 0 4px rgba(201,138,151,0.15);
+  }
+  .last-stamp { font-size: 12px; color: #9C8797; margin-top: 10px; }
+  .note {
+    background: #2A1F29; border: 1px solid #423040; border-radius: 10px;
+    padding: 12px 14px; font-size: 13px; color: #E4D6DA; margin-top: 16px;
+  }
+  .msg { text-align: center; font-size: 13px; color: #D9B382; margin-top: 14px; }
+  .link-btn {
+    background: transparent; color: #9C8797; font-size: 12px; padding: 10px;
+    width: 100%; text-align: center; margin-top: 14px;
+  }
+  .footer { text-align: center; font-size: 10px; color: #6f5f6c; margin-top: 40px; }
+  .loading { text-align: center; padding: 40px 0; color: #9C8797; font-size: 13px; }
+  .hidden { display: none; }
+  .stack > * + * { margin-top: 14px; }
+
+  .client-list { list-style: none; margin: 0; padding: 0; }
+  .client-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid #423040; gap: 10px;
+  }
+  .client-item:last-child { border-bottom: none; }
+  .client-info { min-width: 0; }
+  .client-name { font-size: 14px; font-weight: 600; color: #F3E9EC; }
+  .client-cpf { font-size: 11px; color: #9C8797; margin-top: 1px; }
+  .client-meta { text-align: right; flex-shrink: 0; }
+  .client-last { font-size: 12px; color: #E4D6DA; }
+  .client-stamps { font-size: 11px; color: #D9B382; margin-top: 2px; }
+  .search-input { margin-bottom: 14px; }
+  .empty-state { text-align: center; padding: 24px 0; color: #9C8797; font-size: 13px; }
+  .err { text-align: center; font-size: 13px; color: #e07a86; margin-top: 14px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.2L20 10l-6.4 1.8L12 18l-1.6-6.2L4 10l6.4-1.8L12 2z"/></svg>
+      <span>Painel do Salão</span>
+    </div>
+    <h1 id="businessName">Carregando…</h1>
+    <div class="ribbon"></div>
+
+    <div class="toolbar">
+      <button onclick="toggleClientes()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Ver clientes
+      </button>
+      <button onclick="toggleCadastro()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Cadastrar cliente
+      </button>
+      <button onclick="toggleSettings()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Recompensa
+      </button>
+    </div>
+
+    <div id="clientesPanel" class="panel hidden">
+      <input id="clientSearch" class="search-input" placeholder="Buscar por nome ou CPF..." oninput="renderClientList()" />
+      <div id="clientListWrap"><div class="loading">Carregando clientes…</div></div>
+    </div>
+
+    <div id="cadastroPanel" class="panel hidden">
+      <div class="field">
+        <label for="regCpf">CPF</label>
+        <input id="regCpf" placeholder="000.000.000-00" inputmode="numeric" />
+      </div>
+      <div class="field">
+        <label for="regName">Nome completo</label>
+        <input id="regName" placeholder="Nome do cliente" />
+      </div>
+      <div class="field">
+        <label for="regPhone">Telefone (opcional)</label>
+        <input id="regPhone" placeholder="(11) 99999-9999" />
+      </div>
+      <button class="btn-gold" onclick="cadastrarCliente()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Cadastrar cliente
+      </button>
+      <div id="cadastroMsg" class="msg hidden"></div>
+    </div>
+
+    <div id="settingsPanel" class="panel hidden">
+      <div class="field">
+        <label for="cfgName">Nome do negócio</label>
+        <input id="cfgName" />
+      </div>
+      <div class="field">
+        <label for="cfgStamps">Quantos selos para ganhar a recompensa</label>
+        <input id="cfgStamps" type="number" min="1" />
+      </div>
+      <div class="field">
+        <label for="cfgReward">Recompensa</label>
+        <input id="cfgReward" placeholder="Ex: Um atendimento grátis" />
+      </div>
+      <button class="btn-gold" onclick="saveSettings()">Salvar configuração</button>
+    </div>
+
+    <div id="lookupForm">
+      <label for="cpf">Digite o CPF do cliente</label>
+      <div class="row">
+        <input id="cpf" placeholder="000.000.000-00" inputmode="numeric" />
+        <button class="btn-icon" onclick="handleLookup()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="result" class="hidden"></div>
+
+    <div class="footer">Dados conectados ao banco de dados do salão em tempo real.</div>
+  </div>
+
+<script>
+// ── Conexão com o mesmo banco de dados (Supabase) do sistema do salão ──
+const SUPABASE_URL = 'https://rliesnosftjhtrvfbhem.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsaWVzbm9zZnRqaHRydmZiaGVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MzYxNDAsImV4cCI6MjA5NzIxMjE0MH0.jmaqLfm4wkamYIQaEIHTm1XFipftsPx1X0DotKbEYfk';
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Todos os dados ficam na mesma tabela "donpita" (chave/valor), com o
+// prefixo "loyalty_" para não se misturar com os dados do hotel.
+async function dbGet(key) {
+  const { data, error } = await supa.from('donpita').select('valor').eq('chave', key).maybeSingle();
+  if (error) throw error;
+  return data ? data.valor : null;
+}
+async function dbSet(key, val) {
+  const { error } = await supa.from('donpita').upsert({ chave: key, valor: val }, { onConflict: 'chave' });
+  if (error) throw error;
+  return true;
+}
+async function dbListPrefix(prefix) {
+  const { data, error } = await supa.from('donpita').select('chave, valor').like('chave', `${prefix}%`);
+  if (error) throw error;
+  return data || [];
+}
+
+let config = { businessName: "Salão de Beleza", stampsNeeded: 10, reward: "Um atendimento grátis" };
+let currentCustomer = null;
+let clientsCache = null;
+
+function formatCPF(v) { return (v || "").replace(/\D/g, ""); }
+function formatDisplayCPF(cpf) {
+  if (!cpf || cpf.length !== 11) return cpf;
+  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+}
+function formatDate(iso) {
+  if (!iso) return "Nunca";
+  const d = new Date(iso);
+  return d.toLocaleDateString("pt-BR");
+}
+function sparkleIcon() {
+  return `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.2L20 10l-6.4 1.8L12 18l-1.6-6.2L4 10l6.4-1.8L12 2z"/></svg>`;
+}
+
+async function loadConfig() {
+  try {
+    const val = await dbGet("loyalty_config");
+    if (val) config = val;
+  } catch (e) {
+    console.error("Erro ao carregar configuração:", e);
+  }
+  document.getElementById("businessName").textContent = config.businessName;
+  document.getElementById("cfgName").value = config.businessName;
+  document.getElementById("cfgStamps").value = config.stampsNeeded;
+  document.getElementById("cfgReward").value = config.reward;
+}
+
+function closeAllPanels() {
+  document.getElementById("settingsPanel").classList.add("hidden");
+  document.getElementById("cadastroPanel").classList.add("hidden");
+  document.getElementById("clientesPanel").classList.add("hidden");
+}
+
+function toggleSettings() {
+  const el = document.getElementById("settingsPanel");
+  const willShow = el.classList.contains("hidden");
+  closeAllPanels();
+  if (willShow) el.classList.remove("hidden");
+}
+
+function toggleCadastro() {
+  const el = document.getElementById("cadastroPanel");
+  const willShow = el.classList.contains("hidden");
+  closeAllPanels();
+  if (willShow) el.classList.remove("hidden");
+}
+
+function toggleClientes() {
+  const el = document.getElementById("clientesPanel");
+  const willShow = el.classList.contains("hidden");
+  closeAllPanels();
+  if (willShow) {
+    el.classList.remove("hidden");
+    loadClientList();
+  }
+}
+
+async function loadClientList() {
+  document.getElementById("clientListWrap").innerHTML = '<div class="loading">Carregando clientes…</div>';
+  try {
+    const rows = await dbListPrefix("loyalty_customer_");
+    clientsCache = rows.map((r) => r.valor).filter(Boolean);
+    clientsCache.sort((a, b) => {
+      const da = a.lastStampDate ? new Date(a.lastStampDate).getTime() : -1;
+      const db = b.lastStampDate ? new Date(b.lastStampDate).getTime() : -1;
+      return db - da;
+    });
+  } catch (e) {
+    document.getElementById("clientListWrap").innerHTML = `<div class="err">Não foi possível carregar os clientes. Verifique a conexão.</div>`;
+    clientsCache = null;
+    return;
+  }
+  renderClientList();
+}
+
+function renderClientList() {
+  const wrap = document.getElementById("clientListWrap");
+  if (!clientsCache) return;
+  const query = (document.getElementById("clientSearch").value || "").toLowerCase().trim();
+  const filtered = clientsCache.filter((c) => {
+    if (!query) return true;
+    return (c.name || "").toLowerCase().includes(query) || (c.cpf || "").includes(query.replace(/\D/g, ""));
+  });
+
+  if (filtered.length === 0) {
+    wrap.innerHTML = `<div class="empty-state">Nenhum cliente cadastrado ainda.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = `<ul class="client-list">${filtered
+    .map(
+      (c) => `
+    <li class="client-item">
+      <div class="client-info">
+        <div class="client-name">${c.name || "Sem nome"}</div>
+        <div class="client-cpf">${formatDisplayCPF(c.cpf)}</div>
+      </div>
+      <div class="client-meta">
+        <div class="client-last">${formatDate(c.lastStampDate)}</div>
+        <div class="client-stamps">${c.stamps || 0}/${config.stampsNeeded} selos</div>
+      </div>
+    </li>`
+    )
+    .join("")}</ul>`;
+}
+
+async function saveSettings() {
+  config = {
+    businessName: document.getElementById("cfgName").value.trim() || "Salão de Beleza",
+    stampsNeeded: Number(document.getElementById("cfgStamps").value) || 10,
+    reward: document.getElementById("cfgReward").value.trim() || "Um atendimento grátis",
+  };
+  try {
+    await dbSet("loyalty_config", config);
+  } catch (e) {
+    alert("Não foi possível salvar. Verifique a conexão e tente novamente.");
+    return;
+  }
+  document.getElementById("businessName").textContent = config.businessName;
+  closeAllPanels();
+}
+
+async function cadastrarCliente() {
+  const cpf = formatCPF(document.getElementById("regCpf").value);
+  const name = document.getElementById("regName").value.trim();
+  const phone = document.getElementById("regPhone").value.trim();
+  const msgEl = document.getElementById("cadastroMsg");
+  msgEl.classList.remove("hidden");
+
+  if (cpf.length !== 11) {
+    msgEl.textContent = "Digite um CPF válido (11 números).";
+    msgEl.style.color = "#e07a86";
+    return;
+  }
+  if (!name) {
+    msgEl.textContent = "Digite o nome do cliente.";
+    msgEl.style.color = "#e07a86";
+    return;
+  }
+
+  let existing;
+  try {
+    existing = await dbGet(`loyalty_customer_${cpf}`);
+  } catch (e) {
+    msgEl.textContent = `Não foi possível verificar o CPF (${e.message || e}). Tente novamente.`;
+    msgEl.style.color = "#e07a86";
+    return;
+  }
+
+  if (existing) {
+    msgEl.textContent = "Esse CPF já está cadastrado.";
+    msgEl.style.color = "#e07a86";
+    return;
+  }
+
+  const newCustomer = {
+    cpf, name, phone,
+    stamps: 0, redeemed: 0, isNew: false,
+    registeredDate: new Date().toISOString(),
+    lastStampDate: null,
+  };
+
+  try {
+    await dbSet(`loyalty_customer_${cpf}`, newCustomer);
+  } catch (e) {
+    msgEl.textContent = `Não foi possível cadastrar (${e.message || e}). Tente novamente.`;
+    msgEl.style.color = "#e07a86";
+    return;
+  }
+
+  msgEl.textContent = `Cliente ${name} cadastrado com sucesso!`;
+  msgEl.style.color = "#D9B382";
+  document.getElementById("regCpf").value = "";
+  document.getElementById("regName").value = "";
+  document.getElementById("regPhone").value = "";
+  clientsCache = null;
+}
+
+async function handleLookup() {
+  const raw = document.getElementById("cpf").value;
+  const cpf = formatCPF(raw);
+  if (!cpf) return;
+
+  document.getElementById("lookupForm").classList.add("hidden");
+  const result = document.getElementById("result");
+  result.classList.remove("hidden");
+  result.innerHTML = '<div class="loading">Carregando…</div>';
+
+  let customer;
+  try {
+    const val = await dbGet(`loyalty_customer_${cpf}`);
+    customer = val || { cpf, name: "", stamps: 0, redeemed: 0, isNew: true, lastStampDate: null };
+  } catch (e) {
+    result.innerHTML = `<div class="err">Não foi possível conectar ao banco de dados. Tente novamente.</div>
+      <button class="link-btn" onclick="resetLookup()">Voltar</button>`;
+    return;
+  }
+  currentCustomer = customer;
+  renderCustomer();
+}
+
+function renderCustomer(msg) {
+  const result = document.getElementById("result");
+  const customer = currentCustomer;
+  const stamps = customer.stamps || 0;
+  const total = config.stampsNeeded;
+
+  let stampsHtml = "";
+  for (let i = 0; i < total; i++) {
+    const filled = i < stamps;
+    stampsHtml += `<div class="stamp ${filled ? "filled" : ""}">${filled ? sparkleIcon() : i + 1}</div>`;
+  }
+
+  result.innerHTML = `
+    <div class="stack">
+      ${customer.isNew ? `<div class="note">Cliente novo! Adicione um nome (opcional) e o primeiro selo.</div>` : ""}
+      ${customer.isNew ? `<input id="customerName" placeholder="Nome do cliente (opcional)" />` : ""}
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-name">${customer.name || formatDisplayCPF(customer.cpf)}</div>
+            <div class="card-progress">${stamps} de ${total} selos</div>
+          </div>
+          ${(customer.redeemed || 0) > 0 ? `<div class="redeemed">🎁 ${customer.redeemed}x resgatado</div>` : ""}
+        </div>
+        <div class="grid">${stampsHtml}</div>
+        ${!customer.isNew ? `<div class="last-stamp">Último selinho: ${formatDate(customer.lastStampDate)}</div>` : ""}
+      </div>
+      <button class="btn-gold" onclick="addStamp()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Adicionar selo
+      </button>
+      ${msg ? `<div class="msg">${msg}</div>` : ""}
+      <button class="link-btn" onclick="resetLookup()">Buscar outro CPF</button>
+    </div>
+  `;
+}
+
+async function addStamp() {
+  if (!currentCustomer) return;
+  const nameInput = document.getElementById("customerName");
+  if (nameInput && nameInput.value.trim() && !currentCustomer.name) {
+    currentCustomer.name = nameInput.value.trim();
+  }
+  currentCustomer.isNew = false;
+  currentCustomer.stamps = (currentCustomer.stamps || 0) + 1;
+  currentCustomer.lastStampDate = new Date().toISOString();
+
+  let msg;
+  if (currentCustomer.stamps >= config.stampsNeeded) {
+    currentCustomer.stamps = 0;
+    currentCustomer.redeemed = (currentCustomer.redeemed || 0) + 1;
+    msg = `🎉 Cartão completo! Cliente ganhou: ${config.reward}`;
+  } else {
+    msg = `Selo adicionado (${currentCustomer.stamps}/${config.stampsNeeded})`;
+  }
+
+  try {
+    await dbSet(`loyalty_customer_${currentCustomer.cpf}`, currentCustomer);
+  } catch (e) {
+    alert(`Não foi possível salvar o selo (${e.message || e}). Tente novamente.`);
+    return;
+  }
+
+  clientsCache = null;
+  renderCustomer(msg);
+}
+
+function resetLookup() {
+  currentCustomer = null;
+  document.getElementById("cpf").value = "";
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("lookupForm").classList.remove("hidden");
+}
+
+function maskCPF(value) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  let out = digits;
+  if (digits.length > 9) out = digits.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, "$1.$2.$3-$4");
+  else if (digits.length > 6) out = digits.replace(/(\d{3})(\d{3})(\d{1,3})/, "$1.$2.$3");
+  else if (digits.length > 3) out = digits.replace(/(\d{3})(\d{1,3})/, "$1.$2");
+  return out;
+}
+
+const cpfInput = document.getElementById("cpf");
+cpfInput.addEventListener("input", (e) => { e.target.value = maskCPF(e.target.value); });
+cpfInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleLookup(); });
+
+const regCpfInput = document.getElementById("regCpf");
+regCpfInput.addEventListener("input", (e) => { e.target.value = maskCPF(e.target.value); });
+
+loadConfig();
+</script>
+</body>
+</html>
