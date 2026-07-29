@@ -88,6 +88,11 @@
   .card-name { font-size: 12px; color: #9C8797; }
   .card-progress { font-size: 14px; color: #E4D6DA; margin-top: 2px; }
   .redeemed { color: #D9B382; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+  .reset-redeemed {
+    background: transparent; border: none; color: #9C8797; padding: 2px; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .reset-redeemed:hover { color: #D9B382; }
   .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
   .stamp {
     aspect-ratio: 1; border-radius: 999px; display: flex; align-items: center; justify-content: center;
@@ -234,6 +239,10 @@
         <input id="cfgWhatsapp" placeholder="Ex: 5511999999999" inputmode="numeric" />
       </div>
       <div class="field">
+        <label for="cfgAgenda">Link de agendamento online (opcional)</label>
+        <input id="cfgAgenda" placeholder="Ex: https://calendly.com/seu-salao" />
+      </div>
+      <div class="field">
         <label for="cfgDesc">Descrição do programa (mostrada pro cliente novo)</label>
         <input id="cfgDesc" placeholder="Ex: A cada atendimento você ganha um selo" />
       </div>
@@ -266,8 +275,12 @@
         <input id="txtInviteTitle" />
       </div>
       <div class="field">
-        <label for="txtInviteButton">Texto do botão de agendar (com WhatsApp configurado)</label>
+        <label for="txtInviteButton">Texto do botão de agendar por WhatsApp</label>
         <input id="txtInviteButton" />
+      </div>
+      <div class="field">
+        <label for="txtInviteAgendaButton">Texto do botão de agendar pelo link</label>
+        <input id="txtInviteAgendaButton" />
       </div>
       <div class="field">
         <label for="txtInviteFallback">Texto sem WhatsApp configurado</label>
@@ -301,6 +314,20 @@
   </div>
 
 <script>
+// Bloqueia o gesto de "puxar pra baixo" que recarrega a página no navegador do celular
+let __touchStartY = 0;
+document.addEventListener('touchstart', (e) => {
+  __touchStartY = e.touches[0].clientY;
+}, { passive: true });
+document.addEventListener('touchmove', (e) => {
+  const touchY = e.touches[0].clientY;
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  if (scrollTop <= 0 && touchY > __touchStartY) {
+    e.preventDefault();
+  }
+}, { passive: false });
+</script>
+<script>
 // ── Conexão com o mesmo banco de dados (Supabase) do sistema do salão ──
 const SUPABASE_URL = 'https://rliesnosftjhtrvfbhem.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsaWVzbm9zZnRqaHRydmZiaGVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MzYxNDAsImV4cCI6MjA5NzIxMjE0MH0.jmaqLfm4wkamYIQaEIHTm1XFipftsPx1X0DotKbEYfk';
@@ -329,6 +356,7 @@ let config = {
   stampsNeeded: 10,
   reward: "Um atendimento grátis",
   whatsapp: "",
+  agendaLink: "",
   description: "A cada atendimento você ganha um selo no seu cartão. Ao completar todos os selos, você ganha a recompensa.",
   texts: {
     eyebrowAdmin: "Painel do Salão",
@@ -338,6 +366,7 @@ let config = {
     newClientNote: "Cliente novo! Adicione um nome (opcional) e o primeiro selo.",
     inviteTitle: "Você ainda não tem cadastro 💫",
     inviteButton: "Gostaria de participar? Clique aqui e agende seu primeiro atendimento",
+    inviteAgendaButton: "Agendar meu primeiro atendimento",
     inviteFallback: "Fale com a gente para agendar seu primeiro atendimento e começar a participar!",
     footerAdmin: "Dados conectados ao banco de dados do salão em tempo real.",
     footerClient: "Dados salvos no banco de dados do salão.",
@@ -376,6 +405,7 @@ async function loadConfig() {
   document.getElementById("cfgStamps").value = config.stampsNeeded;
   document.getElementById("cfgReward").value = config.reward;
   document.getElementById("cfgWhatsapp").value = config.whatsapp || "";
+  document.getElementById("cfgAgenda").value = config.agendaLink || "";
   document.getElementById("cfgDesc").value = config.description || "";
 
   document.getElementById("eyebrowAdminText").textContent = config.texts.eyebrowAdmin;
@@ -389,6 +419,7 @@ async function loadConfig() {
   document.getElementById("txtNewClientNote").value = config.texts.newClientNote;
   document.getElementById("txtInviteTitle").value = config.texts.inviteTitle;
   document.getElementById("txtInviteButton").value = config.texts.inviteButton;
+  document.getElementById("txtInviteAgendaButton").value = config.texts.inviteAgendaButton;
   document.getElementById("txtInviteFallback").value = config.texts.inviteFallback;
   document.getElementById("txtFooterAdmin").value = config.texts.footerAdmin;
   document.getElementById("txtFooterClient").value = config.texts.footerClient;
@@ -558,6 +589,7 @@ async function saveTextos() {
     newClientNote: document.getElementById("txtNewClientNote").value.trim() || "Cliente novo! Adicione um nome (opcional) e o primeiro selo.",
     inviteTitle: document.getElementById("txtInviteTitle").value.trim() || "Você ainda não tem cadastro 💫",
     inviteButton: document.getElementById("txtInviteButton").value.trim() || "Gostaria de participar? Clique aqui e agende seu primeiro atendimento",
+    inviteAgendaButton: document.getElementById("txtInviteAgendaButton").value.trim() || "Agendar meu primeiro atendimento",
     inviteFallback: document.getElementById("txtInviteFallback").value.trim() || "Fale com a gente para agendar seu primeiro atendimento e começar a participar!",
     footerAdmin: document.getElementById("txtFooterAdmin").value.trim() || "Dados conectados ao banco de dados do salão em tempo real.",
     footerClient: document.getElementById("txtFooterClient").value.trim() || "Dados salvos no banco de dados do salão.",
@@ -617,6 +649,7 @@ async function saveSettings() {
     stampsNeeded: Number(document.getElementById("cfgStamps").value) || 10,
     reward: document.getElementById("cfgReward").value.trim() || "Um atendimento grátis",
     whatsapp: document.getElementById("cfgWhatsapp").value.replace(/\D/g, ""),
+    agendaLink: document.getElementById("cfgAgenda").value.trim(),
     description: document.getElementById("cfgDesc").value.trim() || "A cada atendimento você ganha um selo no seu cartão. Ao completar todos os selos, você ganha a recompensa.",
   };
   try {
@@ -756,7 +789,13 @@ function renderCustomer(msg) {
             <div class="card-progress">${stamps} de ${total} selos</div>
           </div>
           <div style="display:flex; align-items:flex-start; gap:8px;">
-            ${(customer.redeemed || 0) > 0 ? `<div class="redeemed">🎁 ${customer.redeemed}x resgatado</div>` : ""}
+            ${(customer.redeemed || 0) > 0 ? `
+              <div class="redeemed">
+                🎁 ${customer.redeemed}x resgatado
+                <button class="reset-redeemed" onclick="resetRedeemed()" title="Reiniciar resgates">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                </button>
+              </div>` : ""}
             ${editBtn}
           </div>
         </div>
@@ -834,6 +873,25 @@ async function salvarEdicaoCliente() {
   editingCustomer = false;
   clientsCache = null;
   renderCustomer("Dados atualizados com sucesso!");
+}
+
+async function resetRedeemed() {
+  if (!currentCustomer || !(currentCustomer.redeemed > 0)) return;
+  if (!confirm("Reiniciar o contador de resgates deste cliente para 0?")) return;
+
+  const previous = currentCustomer.redeemed;
+  currentCustomer.redeemed = 0;
+
+  try {
+    await dbSet(`loyalty_customer_${currentCustomer.cpf}`, currentCustomer);
+  } catch (e) {
+    currentCustomer.redeemed = previous;
+    alert(`Não foi possível reiniciar os resgates (${e.message || e}). Tente novamente.`);
+    return;
+  }
+
+  clientsCache = null;
+  renderCustomer("Resgates reiniciados.");
 }
 
 async function removeStamp() {
