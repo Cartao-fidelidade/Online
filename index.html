@@ -143,6 +143,27 @@
     margin-top: 14px; font-size: 12px; color: #9C8797; transition: color 0.3s ease;
   }
   .demo-status.complete { color: #D9B382; font-weight: 600; }
+
+  .demo-gift {
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin-top 0.4s ease;
+  }
+  .demo-gift.show {
+    max-height: 120px; opacity: 1; margin-top: 14px;
+  }
+  .demo-gift-icon {
+    font-size: 40px; display: inline-block;
+  }
+  .demo-gift.show .demo-gift-icon { animation: giftPop 0.6s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes giftPop {
+    0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+    60% { transform: scale(1.25) rotate(8deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  .demo-gift-text {
+    font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 22px;
+    color: #D9B382; margin-top: 4px;
+  }
 </style>
 </head>
 <body>
@@ -170,6 +191,10 @@
       <div class="demo-caption">A cada atendimento, um selinho no seu cartão ✨</div>
       <div class="demo-card" id="demoCard">
         <div class="demo-grid" id="demoGrid"></div>
+        <div class="demo-gift" id="demoGift">
+          <div class="demo-gift-icon">🎁</div>
+          <div class="demo-gift-text">Pode ser você!</div>
+        </div>
         <div class="demo-status" id="demoStatus">Colecionando selinhos…</div>
       </div>
     </div>
@@ -266,6 +291,7 @@ function startDemoAnimation() {
   const grid = document.getElementById("demoGrid");
   const status = document.getElementById("demoStatus");
   const card = document.getElementById("demoCard");
+  const gift = document.getElementById("demoGift");
   const total = Math.max(3, Math.min(config.stampsNeeded || 10, 10));
 
   grid.innerHTML = "";
@@ -287,11 +313,13 @@ function startDemoAnimation() {
       setTimeout(tick, 550);
     } else {
       card.classList.add("complete");
-      status.textContent = `🎉 Cartão completo!`;
+      status.textContent = "🎉 Cartão completo!";
       status.classList.add("complete");
+      gift.classList.add("show");
       setTimeout(() => {
         card.classList.remove("complete");
         status.classList.remove("complete");
+        gift.classList.remove("show");
         status.textContent = "Colecionando selinhos…";
         stamps.forEach((el, idx) => {
           el.classList.remove("filled", "pop");
@@ -299,7 +327,7 @@ function startDemoAnimation() {
         });
         i = 0;
         setTimeout(tick, 900);
-      }, 1600);
+      }, 2200);
     }
   }
   setTimeout(tick, 700);
