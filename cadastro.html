@@ -9,6 +9,12 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
 
+  :root {
+    --bg-color: #0F1626;
+    --accent-1: #4F86F7;
+    --accent-2: #5FD3F3;
+  }
+
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html {
     touch-action: pan-y;
@@ -18,7 +24,7 @@
   }
   body {
     margin: 0;
-    background: #0F1626;
+    background: var(--bg-color);
     color: #EAF0FB;
     font-family: 'Inter', system-ui, sans-serif;
     min-height: 100vh;
@@ -35,7 +41,7 @@
     color: #8B96BA; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
     margin-bottom: 6px;
   }
-  .eyebrow svg { color: #4F86F7; }
+  .eyebrow svg { color: var(--accent-1); }
   h1 {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 700;
@@ -46,7 +52,7 @@
   }
   .ribbon {
     height: 3px; width: 100%; border-radius: 999px;
-    background: linear-gradient(90deg, transparent, #4F86F7 15%, #5FD3F3 50%, #4F86F7 85%, transparent);
+    background: linear-gradient(90deg, transparent, var(--accent-1) 15%, var(--accent-2) 50%, var(--accent-1) 85%, transparent);
     margin-bottom: 20px;
   }
   .toolbar {
@@ -56,7 +62,7 @@
     background: transparent; color: #8B96BA; font-size: 12px; display: flex; align-items: center; gap: 6px;
     font-family: inherit; cursor: pointer; border: 1px solid #2A3555; border-radius: 8px; padding: 7px 10px;
   }
-  .toolbar button:hover { color: #4F86F7; border-color: #4F86F7; }
+  .toolbar button:hover { color: var(--accent-1); border-color: var(--accent-1); }
   .panel {
     background: #1A2340; border: 1px solid #2A3555; border-radius: 14px;
     padding: 16px; margin-bottom: 20px;
@@ -65,20 +71,20 @@
   label { font-size: 12px; color: #8B96BA; display: block; margin-bottom: 6px; }
   input {
     width: 100%;
-    background: #0F1626; border: 1px solid #2A3555; border-radius: 10px;
+    background: var(--bg-color); border: 1px solid #2A3555; border-radius: 10px;
     color: #EAF0FB; padding: 12px 14px; font-size: 16px; outline: none;
     font-family: inherit;
   }
-  input:focus { border-color: #4F86F7; }
+  input:focus { border-color: var(--accent-1); }
   .row { display: flex; gap: 8px; }
   .row input { flex: 1; }
   button { font-family: inherit; cursor: pointer; border: none; }
   .btn-gold {
-    width: 100%; background: linear-gradient(90deg, #4F86F7, #5FD3F3); color: #0F1626; font-weight: 600; border-radius: 10px;
+    width: 100%; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); color: var(--bg-color); font-weight: 600; border-radius: 10px;
     padding: 13px 18px; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .btn-icon {
-    background: linear-gradient(90deg, #4F86F7, #5FD3F3); color: #0F1626; border-radius: 10px; width: 48px;
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); color: var(--bg-color); border-radius: 10px; width: 48px;
     display: flex; align-items: center; justify-content: center;
   }
   .card {
@@ -88,12 +94,12 @@
   .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
   .card-name { font-size: 12px; color: #8B96BA; }
   .card-progress { font-size: 14px; color: #C7D3EE; margin-top: 2px; }
-  .redeemed { color: #5FD3F3; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+  .redeemed { color: var(--accent-2); font-size: 12px; display: flex; align-items: center; gap: 4px; }
   .reset-redeemed {
     background: transparent; border: none; color: #8B96BA; padding: 2px; display: flex;
     align-items: center; justify-content: center;
   }
-  .reset-redeemed:hover { color: #5FD3F3; }
+  .reset-redeemed:hover { color: var(--accent-2); }
   .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
   .stamp {
     aspect-ratio: 1; border-radius: 999px; display: flex; align-items: center; justify-content: center;
@@ -101,7 +107,7 @@
     transition: all 0.25s ease;
   }
   .stamp.filled {
-    background: linear-gradient(135deg, #4F86F7, #5FD3F3); border-color: transparent; color: #0F1626;
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); border-color: transparent; color: var(--bg-color);
     box-shadow: 0 0 0 4px rgba(79,134,247,0.15);
   }
   .last-stamp { font-size: 12px; color: #8B96BA; margin-top: 10px; }
@@ -109,7 +115,7 @@
     background: #1A2340; border: 1px solid #2A3555; border-radius: 10px;
     padding: 12px 14px; font-size: 13px; color: #C7D3EE; margin-top: 16px;
   }
-  .msg { text-align: center; font-size: 13px; color: #5FD3F3; margin-top: 14px; }
+  .msg { text-align: center; font-size: 13px; color: var(--accent-2); margin-top: 14px; }
   .link-btn {
     background: transparent; color: #8B96BA; font-size: 12px; padding: 10px;
     width: 100%; text-align: center; margin-top: 14px;
@@ -139,7 +145,7 @@
     background: transparent; border: 1px solid #2A3555; color: #8B96BA; border-radius: 8px;
     width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .edit-toggle:hover { color: #4F86F7; border-color: #4F86F7; }
+  .edit-toggle:hover { color: var(--accent-1); border-color: var(--accent-1); }
   .edit-form { background: #1A2340; border: 1px solid #2A3555; border-radius: 14px; padding: 16px; }
   .edit-form .field:last-of-type { margin-bottom: 0; }
   .edit-form .stamp-actions { margin-top: 14px; }
@@ -148,14 +154,14 @@
   .client-cpf { font-size: 11px; color: #8B96BA; margin-top: 1px; }
   .client-meta { text-align: right; flex-shrink: 0; }
   .client-last { font-size: 12px; color: #C7D3EE; }
-  .client-stamps { font-size: 11px; color: #5FD3F3; margin-top: 2px; }
+  .client-stamps { font-size: 11px; color: var(--accent-2); margin-top: 2px; }
   .search-input { margin-bottom: 14px; }
   .empty-state { text-align: center; padding: 24px 0; color: #8B96BA; font-size: 13px; }
   .err { text-align: center; font-size: 13px; color: #e07a86; margin-top: 14px; }
   .rank-badge {
     width: 30px; height: 30px; border-radius: 999px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #4F86F7, #5FD3F3); color: #0F1626;
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: var(--bg-color);
     font-size: 12px; font-weight: 700;
   }
 </style>
@@ -252,6 +258,21 @@
         <label for="cfgInstagram">@ do Instagram (aparece como crédito no rodapé, opcional)</label>
         <input id="cfgInstagram" placeholder="Ex: @bialashhair" />
       </div>
+      <div class="row" style="margin-bottom:12px;">
+        <div class="field" style="margin-bottom:0;">
+          <label for="cfgBgColor">Cor de fundo</label>
+          <input id="cfgBgColor" type="color" style="padding:4px; height:44px;" />
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="cfgAccent1">Cor de destaque 1</label>
+          <input id="cfgAccent1" type="color" style="padding:4px; height:44px;" />
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="cfgAccent2">Cor de destaque 2</label>
+          <input id="cfgAccent2" type="color" style="padding:4px; height:44px;" />
+        </div>
+      </div>
+      <div class="note" style="margin-top:0; margin-bottom:12px;">As cores de destaque são usadas nos botões, selos e detalhes. A logo em si (imagem) não muda de cor — para trocar a logo, envie uma nova imagem.</div>
       <button class="btn-gold" onclick="saveSettings()">Salvar configuração</button>
     </div>
 
@@ -365,6 +386,9 @@ let config = {
   agendaLink: "",
   instagram: "",
   description: "A cada atendimento você ganha um selo no seu cartão. Ao completar todos os selos, você ganha a recompensa.",
+  bgColor: "#0F1626",
+  accent1: "#4F86F7",
+  accent2: "#5FD3F3",
   texts: {
     eyebrowAdmin: "Painel do Salão",
     eyebrowClient: "Cartão Fidelidade",
@@ -423,6 +447,12 @@ async function loadConfig() {
   document.getElementById("cfgAgenda").value = config.agendaLink || "";
   document.getElementById("cfgInstagram").value = config.instagram ? `@${config.instagram}` : "";
   document.getElementById("cfgDesc").value = config.description || "";
+  document.getElementById("cfgBgColor").value = config.bgColor || "#0F1626";
+  document.getElementById("cfgAccent1").value = config.accent1 || "#4F86F7";
+  document.getElementById("cfgAccent2").value = config.accent2 || "#5FD3F3";
+  document.documentElement.style.setProperty("--bg-color", config.bgColor || "#0F1626");
+  document.documentElement.style.setProperty("--accent-1", config.accent1 || "#4F86F7");
+  document.documentElement.style.setProperty("--accent-2", config.accent2 || "#5FD3F3");
 
   document.getElementById("eyebrowAdminText").textContent = config.texts.eyebrowAdmin;
   document.getElementById("lookupLabelText").textContent = config.texts.lookupLabelAdmin;
@@ -626,7 +656,7 @@ async function saveTextos() {
   document.getElementById("footerText").textContent = config.texts.footerAdmin;
 
   msgEl.textContent = "Textos salvos com sucesso!";
-  msgEl.style.color = "#5FD3F3";
+  msgEl.style.color = "var(--accent-2)";
 }
 
 // Abre o cartão de um cliente já cadastrado a partir da lista,
@@ -668,6 +698,9 @@ async function saveSettings() {
     agendaLink: document.getElementById("cfgAgenda").value.trim(),
     description: document.getElementById("cfgDesc").value.trim() || "A cada atendimento você ganha um selo no seu cartão. Ao completar todos os selos, você ganha a recompensa.",
     instagram: normalizeInstagram(document.getElementById("cfgInstagram").value),
+    bgColor: document.getElementById("cfgBgColor").value || "#0F1626",
+    accent1: document.getElementById("cfgAccent1").value || "#4F86F7",
+    accent2: document.getElementById("cfgAccent2").value || "#5FD3F3",
   };
   try {
     await dbSet("loyalty_config", config);
@@ -676,6 +709,9 @@ async function saveSettings() {
     return;
   }
   document.getElementById("businessName").textContent = config.businessName;
+  document.documentElement.style.setProperty("--bg-color", config.bgColor);
+  document.documentElement.style.setProperty("--accent-1", config.accent1);
+  document.documentElement.style.setProperty("--accent-2", config.accent2);
   closeAllPanels();
 }
 
@@ -728,7 +764,7 @@ async function cadastrarCliente() {
   }
 
   msgEl.textContent = `Cliente ${name} cadastrado com sucesso!`;
-  msgEl.style.color = "#5FD3F3";
+  msgEl.style.color = "var(--accent-2)";
   document.getElementById("regCpf").value = "";
   document.getElementById("regName").value = "";
   document.getElementById("regPhone").value = "";
